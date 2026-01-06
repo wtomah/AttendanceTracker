@@ -7,20 +7,19 @@ cur = conn.cursor()
 cur.execute('''CREATE TABLE IF NOT EXISTS timesheet
             (name VARCHAR(255) NOT NULL,
             id INTEGER, 
-            timePunchIn DATE, 
-            timePunchOut DATE 
+            timePunchIn DATE 
             )''')
 
 cur.execute('''CREATE TABLE IF NOT EXISTS login
             (username VARCHAR(255) NOT NULL,
             password VARCHAR(255) NOT NULL,
-            id INTEGER AUTO INCREMENT PRIMARY KEY)''')
+            id INTEGER PRIMARY KEY AUTOINCREMENT)''')
 
-first_employee = ('William Tomah', 1, '2025-01-02 11:00:31', '2025-01-02 20:18:00')
+first_employee = ('William Tomah', 1, '2025-01-02 11:00:31')
 
 username1, password1, id = "wtomah", "DallasFan1", 1
 
-#cur.execute("INSERT INTO login (username, password, id) VALUES (?, ?, ?)", (username1, password1, id))
+cur.execute("INSERT INTO login (username, password, id) VALUES (?, ?, ?)", (username1, password1, id))
 
 def intro():
     choice = int(input("Log In or Create User (1/2)"))
@@ -34,24 +33,36 @@ def createUser():
     print("Enter your user information")
     username = input("Username: ")
     password = input("Password: ")
+    firstname = input("First Name: ")
+    lastname = input("Last Name: ")
+
+    name = firstname + " " + lastname
 
     cur.execute("INSERT INTO login (username, password, id) VALUES (?, ?, ?)", (username, password, id))
 
+    cur.execute("INSERT INTO timesheet (name, id, timePunchIn) VALUES (?, ?, ?)", (name, id))
+
     login()
 
-
 def login():
-    username = input("Enter Username: ")
-    password = input("Enter Password: ")
+    attempts = 5
 
-    cur.execute("SELECT * FROM login WHERE username = ? AND password = ?", (username, password))
+    while attempts > 0:
+        username = input("Enter Username: ")
+        password = input("Enter Password: ")
 
-    if cur.fetchall():
-        menu()
-    else:
-        print("Username and/or password are invalid. Try again!")
-        login()
+        cur.execute("SELECT * FROM login WHERE username = ? AND password = ?", (username, password))
 
+
+        if cur.fetchall():
+            print("Login Succesful!")
+            attempts = 5
+            menu()
+            return
+        else:
+            attempts -= 1
+            print(f"Username and/or password are invalid. You have {attempts} attempts left!")
+            
 
 
 def menu():
@@ -72,13 +83,13 @@ def menu():
 
     elif option == 2:
 
-        info = cur.execute('SELECT timesheet.name, login.username, timesheet.id FROM timesheet' \
-        ' INNER JOIN login ON timesheet.id=login.id WHERE login.username = ?', (username))
+        '''info = cur.execute('SELECT timesheet.name, login.username, timesheet.id FROM timesheet' \
+        ' INNER JOIN login ON timesheet.id=login.id WHERE login.username = ?', (username))'''
 
-        print(info)
+        #print(info)
 
     elif option == 3:
-        print("Are you checking in or checking out?")
+        pass
 
     elif option == 4:
         login()
