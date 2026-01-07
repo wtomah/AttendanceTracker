@@ -1,3 +1,5 @@
+import hashlib
+
 def create_user(cur):
     print("Enter your user information")
     username = input("Username: ")

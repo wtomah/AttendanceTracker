@@ -1,6 +1,6 @@
 # Attendance Tracker
 ## Programming Languages
-- Python
+- A Python CLI attendance tracking application using SQLite.
 
 ## Features
 - User Authentication
