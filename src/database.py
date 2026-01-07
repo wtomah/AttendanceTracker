@@ -9,7 +9,7 @@ def create_tables(conn):
 
     cur.execute('''CREATE TABLE IF NOT EXISTS timesheet
             (name VARCHAR(255) NOT NULL,
-            id INTEGER, 
+            user_id INTEGER, 
             timePunchIn DATE 
             )''')
 

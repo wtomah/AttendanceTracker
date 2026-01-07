@@ -45,3 +45,11 @@ def login(cur):
             print(f"Invalid login. {attempts} attempts left.")
 
     return None
+
+def logout(cur):
+    logout_option = input("Would you like to return to the login page? (y/n)")
+
+    if logout_option == 'y':
+        login(cur)
+    else:
+        quit()
