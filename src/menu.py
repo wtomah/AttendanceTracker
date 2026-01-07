@@ -1,52 +1,93 @@
 from datetime import datetime
 
 def menu(cur, user_id):
+    while True:
+        print("\nWelcome to the Attendance App")
+        print("1. Check Timesheet")
+        print("2. Show Profile")
+        print("3. Punch In")
+        print("4. Punch Out")
+        print("5. Log Out")
+        print("6. Exit")
 
-    print("Welcome to the Attendance App")
+        try:
+            option = int(input("Select an option: "))
+        except ValueError:
+            print("Please enter a number.")
+            continue
 
-    print("1. Check Timesheet ")
-    print("2. Show Profile")
-    print("3. Punch In")
-    print("4. Log Out")
-    print("5. Exit")
-
-    option = int(input("Select an option: "))
-
-    if option == 1:
-        for row in cur.execute('SELECT * FROM timesheet'):
-            print(row)
-
-    elif option == 2:
-        cur.execute("""
-                SELECT timesheet.name, login.username, timesheet.user_id
+        # Check Timesheet
+        if option == 1:
+            cur.execute("""
+                SELECT punch_in, punch_out
                 FROM timesheet
-                JOIN login ON timesheet.user_id = login.id
-                WHERE login.id = ?
+                WHERE user_id = ?
+                ORDER BY punch_in DESC
             """, (user_id,))
-        print(cur.fetchone())
+            rows = cur.fetchall()
 
-        menu_option = input("Would you like to return to menu? (y/n)")
+            if not rows:
+                print("No punch history.")
+            else:
+                for punch_in, punch_out in rows:
+                    print(f"In: {punch_in} | Out: {punch_out}")
 
-        if menu_option == 'y':
-            menu(cur, user_id)
-        else:
+        # Show Profile
+        elif option == 2:
+            cur.execute("SELECT username FROM login WHERE id = ?", (user_id,))
+            print("Username:", cur.fetchone()[0])
+
+        # Punch In
+        elif option == 3:
+            cur.execute("""
+                SELECT id FROM timesheet
+                WHERE user_id = ? AND punch_out IS NULL
+            """, (user_id,))
+
+            if cur.fetchone():
+                print("You are already punched in.")
+                continue
+
+            punch_in_time = datetime.now().isoformat(timespec="seconds")
+
+            cur.execute("""
+            INSERT INTO timesheet (user_id, punch_in)
+            VALUES (?, ?)
+            """, (user_id, punch_in_time))
+
+
+            print("Punched in at", punch_in_time)
+
+        # Punch Out
+        elif option == 4:
+            punch_out_time = datetime.now().isoformat(timespec="seconds")
+
+            cur.execute("""
+                SELECT id FROM timesheet
+                WHERE user_id = ? AND punch_out IS NULL
+            """, (user_id,))
+
+            row = cur.fetchone()
+
+            if not row:
+                print("You are not currently punched in.")
+                continue
+
+            cur.execute("""
+                UPDATE timesheet
+                SET punch_out = ?
+                WHERE id = ?
+            """, (punch_out_time, row[0]))
+
+            print("Punched out at", punch_out_time)
+
+        # Log Out
+        elif option == 5:
+            return
+
+        # Exit
+        elif option == 6:
             quit()
-        
 
-
-    elif option == 3:
-        punchInTime = datetime.now()
-
-        cur.execute("""UPDATE timesheet 
-                    SET timePunchIn = ?
-                    WHERE user_id = ?""", (punchInTime, user_id))
-        
-        menu(cur, user_id)
-        
-
-
-    elif option == 4:
-        return
-    
-    elif option == 5:
-        quit()
+        else:
+            print("Invalid option.")

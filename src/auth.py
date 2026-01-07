@@ -14,11 +14,6 @@ def create_user(cur):
 
     user_id = cur.lastrowid
 
-    cur.execute(
-        "INSERT INTO timesheet (name, user_id, timePunchIn) VALUES (?, ?, NULL)",
-        (name, user_id)
-    )
-
     print("User created successfully!")
     return user_id
 
@@ -45,11 +40,3 @@ def login(cur):
             print(f"Invalid login. {attempts} attempts left.")
 
     return None
-
-def logout(cur):
-    logout_option = input("Would you like to return to the login page? (y/n)")
-
-    if logout_option == 'y':
-        login(cur)
-    else:
-        quit()
