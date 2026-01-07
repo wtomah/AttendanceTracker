@@ -55,3 +55,20 @@ def login(cur):
             print(f"Invalid login. {attempts} attempts left.")
 
     return None
+
+
+def forgot_password(cur):
+    hash_object = hashlib.sha256()
+
+    new_username = input("Enter username")
+    new_password = input("Enter new password")
+
+    hash_object.update(new_password.encode('utf-8'))
+    hex_digest = hash_object.hexdigest()
+
+    cur.execute("""UPDATE login
+                SET password = ? 
+                WHERE username = ?""", (hex_digest, new_username))
+    
+    print("Update Succesful")
+
