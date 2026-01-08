@@ -15,7 +15,7 @@ def create_tables(conn):
         punch_out TEXT)""")
 
     cur.execute('''CREATE TABLE IF NOT EXISTS login
-            (username VARCHAR(255) NOT NULL,
+            (username VARCHAR(255) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
             id INTEGER PRIMARY KEY AUTOINCREMENT)''')
     

@@ -70,5 +70,7 @@ def forgot_password(cur):
                 SET password = ? 
                 WHERE username = ?""", (hex_digest, new_username))
     
+    cur.connection.commit()
+    
     print("Update Succesful")
 
